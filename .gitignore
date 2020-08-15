@@ -4,3 +4,4 @@ __pycache__/
 *.bak
 test
 run.bat
+config.json
