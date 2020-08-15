@@ -122,9 +122,9 @@ class CQEncoder:
                             chain.append(Image(url=self.getCQattr(cqImg, "url"), imageId=imgid.upper()))
 
                         else:
-                            print("UUID格式不正确")
+                            print("UUID格式不正确!")
                     else:
-                        print("找不到图片UUID")
+                        print("找不到图片UUID!")
                 else:
                     imgid = "/" + self.getMidString(self.getCQattr(x[0], "url")[7:], "//", "/0")
                     chain.append(Image(url=self.getCQattr(x[0], "url"), imageId=imgid.upper()))

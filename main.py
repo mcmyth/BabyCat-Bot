@@ -6,7 +6,7 @@ mirai_api_http_locate = configManager.config["user"]["httpapi"]
 app = Mirai(f"mirai://{mirai_api_http_locate}?authKey={authKey}&qq={qq}")
 
 
-Log.write("", "", "[i]系统消息", f"QQ:{qq}启动成功")
+Log.write("", "", "[i]系统消息", f"QQ:{qq}启动成功.")
 @app.receiver("FriendMessage")
 async def event_gm(app: Mirai, friend: Friend, message: MessageChain):
     cqMessage = CQEncoder.messageChainToCQ(message)
