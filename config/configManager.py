@@ -3,7 +3,7 @@ import os
 class Config:
     config = {}
     def saveConfig(self):
-        f = open('config/config.json', 'w')
+        f= open('config/config.json', 'w')
         f.write(str(json.dumps(self.config, sort_keys=True, indent=2)))
         f.close()
 
