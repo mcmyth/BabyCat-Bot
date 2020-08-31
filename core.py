@@ -5,6 +5,7 @@ configManager = Config()
 CQEncoder = CQEncoder()
 Log = Log()
 
+#运行命令
 async def run_command(type: str, data: dict):
     app = data[Mirai]
     qq = configManager.config["user"]["qq"]
