@@ -1,5 +1,5 @@
 {
-  "group": 673955895,
+  "group": 1000,
   "cookie": {
     "WHMCS0BbJxlrSSwev": "bgtj5v0h7jq15e0ua8hotre8e5"
   },
@@ -9,10 +9,10 @@
     "username": ""
   },
   "user": {
-    "product": "1281"
+    "product": ""
   },
   "yesterday": {
-    "download": 53.81,
-    "upload": 0.72
+    "download": 0,
+    "upload": 0
   }
 }
