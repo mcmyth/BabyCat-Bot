@@ -1,0 +1,7 @@
+{
+  "user": {
+    "authKey": "Your key",
+    "httpapi": "localhost:55004/ws",
+    "qq": 10000
+  }
+}
