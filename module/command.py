@@ -92,7 +92,9 @@ def set(command, qq, group):
             else:
                 return "参数不足"
         if command[2] == "admin":
+            qqNumber = command[3]
             command[3] =  CQEncoder.getCQattr(command[3],"qq")
+            if command[3] == None: command[3] = qqNumber
             if command[3] == "this": command[3] = str(qq.id)
             print(command[3])
             if len(command) >=4  and  len(command) < 5:
