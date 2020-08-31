@@ -18,7 +18,8 @@ class WikiPic:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36',
             'accept-language':'zh-CN,zh;q=0.9'
         }
-        async with session.get(url,headers=headers,proxy='') as response:
+        #修改为正确的代理地址，仅支持HTTP代理，不需要代理可删除proxy或留空
+        async with session.get(url,headers=headers,proxy="") as response:
             return await response.text(encoding='utf8')
 
     # 处理网页
@@ -74,5 +75,9 @@ class WikiPic:
             f"{self.year}年{self.month}月", safe='')
         return await self.download(url)
 
+
+
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
