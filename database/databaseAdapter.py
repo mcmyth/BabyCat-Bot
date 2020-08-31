@@ -45,6 +45,17 @@ CREATE TABLE "log" (
   "message" TEXT
 );
 ''')
+
+        self.cur.execute('''
+CREATE TABLE "main"."queue" (
+  "id" INTEGER NOT NULL,
+  "type" integer(20),
+  "qq_group" integer(20),
+  "qq_number" INTEGER(20),
+  "create_date" text,
+  PRIMARY KEY ("id")
+);
+        ''')
         self.conn.commit()
         print("数据库不存在，已自动创建")
 
@@ -119,6 +130,31 @@ class User(DatabaseAdapter):
                 return True
             else:
                 return False
+
+    def joinQueue(self,type,qq_group, qq_number, create_date=None):
+        if create_date == None:create_date = dateTime.timestampToDateTime()
+        sql = "INSERT INTO `queue` (`type`, `qq_group`, `qq_number`, `create_date`) VALUES (?, ?, ?, ?)"
+        self.cur.execute(sql, (type,qq_group, qq_number, create_date))
+        self.conn.commit()
+        if not self.cur.rowcount == 0:
+             return True
+        else:
+            return False
+
+    def searchQueue(self,type,qq_group, qq_number):
+        sql = "SELECT id,type,qq_group,qq_number  from queue where type= ? and qq_group=? and qq_number=?"
+        result = tuple(self.cur.execute(sql, (type,qq_group, qq_number)))
+        self.conn.commit()
+        return result
+
+    def deleteQueue(self,id):
+        sql = "DELETE FROM queue WHERE id = ?"
+        self.cur.execute(sql,(id,))
+        self.conn.commit()
+        if not self.cur.rowcount == 0:
+            return False
+        else:
+            return True
 
 class Log(DatabaseAdapter):
     def write(self,member,group,type,message):

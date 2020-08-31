@@ -48,6 +48,10 @@ async def run_command(type: str, data: dict):
         cqMessage = CQEncoder.messageChainToCQ(message)
         sendMessage = ""
         print(f"[{dateTime.timestampToDateTime()}]{cqMessage}")
+        if ocrQueueCheck(group.id,member.id):
+            if cqMessage[:9] == "[CQ:image" and message.__root__[1].type == "Image":
+                sendMessage = await tencent_ocr(cqMessage, (member.id, group.id))
+                await app.sendGroupMessage(group,sendMessage ,quoteSource=source)
         if (cqMessage[0:4].lower() == "/cat"):
             if (cqMessage.lower() == "/cat"):
                 sendMessage = "啪！"
@@ -65,7 +69,7 @@ async def run_command(type: str, data: dict):
                         await app.sendGroupMessage(group, await tencent_ocr(command[1], (member.id, group.id)),
                                                    quoteSource=source)
                     else:
-                        sendMessage = "参数不足"
+                        sendMessage = ocrQueue(group.id, member.id)
                         await app.sendGroupMessage(group, sendMessage)
                 if (command[0] == "info"):
                     sendMessage = getInfo(qq, group)
@@ -85,7 +89,7 @@ async def run_command(type: str, data: dict):
                         os.remove(wikipic["imagePath"])
                     return
                 if command[0] == "testt":
-                    await app.sendGroupMessage(group, CQEncoder.cqToMessageChain(command[1]))
+                    await app.sendGroupMessage(group,str(ocrQueueCheck(group.id,member.id)))
                 if isinstance(sendMessage, list):
                     Log.write(qq, group.id, "[↑]群组消息", CQEncoder.messageChainToCQ(sendMessage))
                 else:

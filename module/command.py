@@ -129,3 +129,18 @@ async def getWikipic(command):
     print("imageFilename:" + imagePath )
     ret = {"sendText":sendText,"imagePath":imagePath}
     return ret
+
+def ocrQueue(qq_group, qq_number):
+    if User.joinQueue("ocr",qq_group, qq_number):
+        return "请发送一个图片进行OCR识别"
+    else:
+        return "请求加入队列失败"
+
+def ocrQueueCheck(qq_group, qq_number):
+    queue = User.searchQueue("ocr",qq_group, qq_number)
+    if len(queue)> 0:
+        id = queue[0][0]
+        User.deleteQueue(id)
+        return True
+    else:
+        return False
