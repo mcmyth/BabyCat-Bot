@@ -69,7 +69,10 @@ def Login():
 def getBandwidth(update=False):
     session = requests.session()
     url = 'https://z96w.win/clientarea.php?action=productdetails&id=' + currenProduct
-    res = session.post(url, data=ccsunConfig["login"], headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
+    try:
+        res = session.post(url, data=ccsunConfig["login"], headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
+    except Exception as e:
+        return str(e)
     # with open('1.html', 'wb') as f:
     #     f.write(res.content)
     html = res.content.decode('utf-8')
@@ -78,7 +81,9 @@ def getBandwidth(update=False):
         Login()
         res = session.post(url, data=ccsunConfig["login"], headers=headers, cookies=ccsunConfig["cookie"], verify=False, allow_redirects=False)
         toal = getMidString(html, "使用报表 (流量：", "GB)")
-        if(toal == None):return "数据异常,请联系管理员。"
+        if(toal == None):
+
+            return "数据异常,请联系管理员。"
 
 
 
@@ -98,7 +103,7 @@ def getBandwidth(update=False):
     usedUpload =  round(upload - yesterdayUpload,2)
 
     text = f'''[使用报表 {str(round(download + upload,2))}/200 GB]
-总流量已用:↑{str(upload)}GB  ↓{str(download)}GB
+总计已用:↑{str(upload)}GB  ↓{str(download)}GB
 当天已用:↑{str(usedUpload)}GB  ↓{str(usedDownload)}GB'''
 
 
@@ -110,7 +115,7 @@ def getBandwidth(update=False):
         if isUpdate:
             text = f'''昨日流量详情:
 [使用报表 {str(round(download + upload, 2))}/200 GB]
-总流量已用:↑{str(upload)}GB  ↓{str(download)}GB
+总计已用:↑{str(upload)}GB  ↓{str(download)}GB
 昨日已用:↑{str(usedUpload)}GB  ↓{str(usedDownload)}GB'''
         else:
             text = f'''昨日流量详情(数据库更新失败):
@@ -122,7 +127,10 @@ def getBandwidth(update=False):
 def getSub():
     session = requests.session()
     url = 'https://z96w.win/clientarea.php?action=productdetails&id=' + currenProduct
-    res = session.post(url, data=ccsunConfig["login"], headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
+    try:
+        res = session.post(url, data=ccsunConfig["login"], headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
+    except Exception as e:
+        return str(e)
     html = res.content.decode('utf-8')
     soup = BeautifulSoup(html, "lxml")
     if len(soup.select("div.panel-body table")) == 0:
