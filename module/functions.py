@@ -53,3 +53,20 @@ def getNetworkImage(url,filename=None):
     with open("temp/" + filename, "wb") as code:
         code.write(data)
     return filename
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
