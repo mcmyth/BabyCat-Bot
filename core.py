@@ -13,25 +13,25 @@ mirai_api_http_locate = configManager.config["user"]["httpapi"]
 app = Mirai(f"mirai://{mirai_api_http_locate}?authKey={authKey}&qq={qq}")
 
 ccsunGroup = ccsunConfig["group"]
-
-i = 0
-async def hello():
-    global i
-    if i > 0:
-        timeNow = time.strftime('%H:%M', time.localtime(time.time()))
-        if timeNow == "00:00":
-            #CCSUN流量统计
+sent = False
+async def Timer1():
+    global sent
+    timeNow = time.strftime('%H:%M', time.localtime(time.time()))
+    if timeNow == "00:00" and sent == False:
+        sent = True
+        try:
+            # CCSUN流量统计
             await app.sendGroupMessage(ccsunGroup, getBandwidth(True))
-            #维基日图
-            try:
-                wikipic = await getWikipic(['wikipic'])
-                sendMessage = wikipic["sendText"]
-                await app.sendGroupMessage(971058508, sendMessage)
-                if os.path.exists(wikipic["imagePath"]):
-                    os.remove(wikipic["imagePath"])
-            except:pass
-    if i == 0:i += 1
-t = RepeatingTimer(60, hello)
+            # 维基日图
+            wikipic = await getWikipic(['wikipic'])
+            sendMessage = wikipic["sendText"]
+            await app.sendGroupMessage(971058508, sendMessage)
+            if os.path.exists(wikipic["imagePath"]):
+                os.remove(wikipic["imagePath"])
+        except:pass
+    if timeNow != "00:00" and sent == True:
+        sent = False
+t = RepeatingTimer(3, Timer1)
 t.start()
 
 #运行指令
@@ -58,7 +58,6 @@ async def run_command(type: str, data: dict):
                 Log.write(qq, group.id, "[↑]群组消息", sendMessage)
                 await app.sendGroupMessage(group, sendMessage, quoteSource=source)
             command = commandDecode(cqMessage[5:])
-            print(command)
             if (len(command) > 0):
                 command[0] = command[0].lower()
                 if (command[0] == "hi"):
