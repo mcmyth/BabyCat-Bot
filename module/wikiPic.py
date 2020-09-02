@@ -6,20 +6,19 @@ import sys
 import urllib.parse
 from module.cqEncoder import *
 from module.dateParse import *
-
+from config.configManager import *
 class WikiPic:
-
     year:str
     month: str
     day:str
-
+    configManager = Config()
     async def fetch(self,session, url):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36',
             'accept-language':'zh-CN,zh;q=0.9'
         }
         #修改为正确的代理地址，仅支持HTTP代理，不需要代理可删除proxy或留空
-        async with session.get(url,headers=headers,proxy="") as response:
+        async with session.get(url,headers=headers,proxy=self.configManager.config["proxy"]) as response:
             return await response.text(encoding='utf8')
 
     # 处理网页
