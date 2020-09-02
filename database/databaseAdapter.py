@@ -112,8 +112,7 @@ class User(DatabaseAdapter):
             if self.cur.rowcount == 0:
                 print("更新数据没有成功")
                 return "更新数据没有成功"
-            return f"已删除({qq})管理员"
-
+            return f"已将({qq})从{status}权限组移除"
         else:
             self.cur.execute('''
             INSERT INTO "main"."global_user"("qq", "status", "desc") VALUES (?, ?, ?)
@@ -121,16 +120,25 @@ class User(DatabaseAdapter):
             self.conn.commit()
             if self.cur.rowcount == 0:
                 return "更新数据没有成功"
-        return f"已将({qq})设为管理员"
+        return f"已将({qq})添加到{status}权限组"
 
     def user_check(self,qq, status):
-        if status == "admin":
-            user = list(self.cur.execute("SELECT qq,status  from global_user where qq= ? and status= 'admin'",(qq,)))
-            if len(user) > 0:
-                return True
-            else:
-                return False
-
+        user = list(self.cur.execute("SELECT qq,status  from global_user where qq= ? and status= ?",(qq,status)))
+        self.conn.commit()
+        if len(user) > 0:
+            return True
+        else:
+            return False
+    def userInfo(self,qq):
+        permissionList = list(self.cur.execute("SELECT qq,status  from global_user where qq= ?",(qq,)))
+        self.conn.commit()
+        if len(permissionList) > 0:
+            permission = str(qq) + "的权限列表:\n"
+            for x in permissionList:
+                permission += x[1] + ","
+            return permission[:-1]
+        else:
+            return f"QQ({str(qq) })没有在任何一个权限组中"
     def joinQueue(self,type,qq_group, qq_number, create_date=None):
         if create_date == None:create_date = dateTime.timestampToDateTime()
         sql = "INSERT INTO `queue` (`type`, `qq_group`, `qq_number`, `create_date`) VALUES (?, ?, ?, ?)"
