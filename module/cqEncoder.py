@@ -1,4 +1,3 @@
-#更新于2020/08/15 18:50 By MC_Myth
 from uuid import UUID
 from mirai import *
 import re
@@ -29,7 +28,12 @@ class CQEncoder:
         if v == None:
             v = self.getMidString(cqCode, cqAttr + "=", "]")
         return v
-
+    def atToQQ(self,cqCode):
+        source = cqCode
+        qqNumber = self.getCQattr(cqCode, "qq")
+        if qqNumber == None: qqNumber = source
+        print(qqNumber)
+        return qqNumber
     #获取CQ码的类型
     def getCQtype(self,cqcode):
         return self.getMidString(cqcode, "[CQ:", ",")
@@ -56,19 +60,18 @@ class CQEncoder:
             cqIndex.append((m.start(), m.end()))
         cqIndex.append((len(text), len(text)))
         return cqIndex
-    def escapeChar(self,text,isEscape=True):
 
+    #转义中括号
+    def escapeChar(self,text,isEscape=True):
         if isEscape:
             text = text.replace("[", "&brackets_left;")
             text = text.replace("]", "&brackets_right;")
         else:
             text = text.replace("&brackets_left;", "[")
             text = text.replace("&brackets_right;", "]")
-        print(text)
         return text
     #将CQ码以外的文本转换成类型为“plain”的CQ码
     def plainToCQ(self,text):
-
         i = 0
         j = 0
         k = 0
