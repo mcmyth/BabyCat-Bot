@@ -56,9 +56,19 @@ class CQEncoder:
             cqIndex.append((m.start(), m.end()))
         cqIndex.append((len(text), len(text)))
         return cqIndex
+    def escapeChar(self,text,isEscape=True):
 
+        if isEscape:
+            text = text.replace("[", "&brackets_left;")
+            text = text.replace("]", "&brackets_right;")
+        else:
+            text = text.replace("&brackets_left;", "[")
+            text = text.replace("&brackets_right;", "]")
+        print(text)
+        return text
     #将CQ码以外的文本转换成类型为“plain”的CQ码
     def plainToCQ(self,text):
+
         i = 0
         j = 0
         k = 0
@@ -73,14 +83,18 @@ class CQEncoder:
                 self.getCQIndex(text)
                 source_text = text[cqIndex[j][k]:cqIndex[j + 1][0]]
                 if source_text != "":
+                    source_text = self.escapeChar(source_text)
                     text = self.replaceChar(text, f"[CQ:plain,text={source_text}]", cqIndex[j][k], cqIndex[j + 1][0])
             else:
                 self.getCQIndex(text)
                 source_text = text[0:cqIndex[0][0]]
                 if (source_text != ""):
+                    source_text = self.escapeChar(source_text)
                     text = self.replaceChar(text, f"[CQ:plain,text={source_text}]", 0, cqIndex[0][0])
             i = i + 1
+        print(text)
         return text
+
 
     #取CQ码配置文件中URL的值
     def getImageURL(self,imgConfigPath, fileName):
@@ -104,7 +118,9 @@ class CQEncoder:
             if self.getCQtype(x[0]) == "face":
                 chain.append(Face(faceId=self.getCQattr(x[0], "id")))
             elif self.getCQtype(x[0]) == "plain":
-                chain.append(Plain(text=self.getCQattr(x[0], "text")))
+                plain = self.getCQattr(x[0],"text")
+                plain = self.escapeChar(plain,False)
+                chain.append(Plain(text=plain))
             elif self.getCQtype(x[0]) == "at":
                 chain.append(At(self.getCQattr(x[0], "qq")))
             elif self.getCQtype(x[0]) == "emoji":
