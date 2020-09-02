@@ -132,7 +132,7 @@ async def getWikipic(command):
 
 def ocrQueue(qq_group, qq_number):
     if User.joinQueue("ocr",qq_group, qq_number):
-        return "请发送一个图片进行OCR识别"
+        return "请发送一个图片进行OCR识别,发送任意文字取消本次操作。"
     else:
         return "请求加入队列失败"
 

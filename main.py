@@ -1,11 +1,4 @@
 from core import *
-
-qq = configManager.config["user"]["qq"]
-authKey = configManager.config["user"]["authKey"]
-mirai_api_http_locate = configManager.config["user"]["httpapi"]
-app = Mirai(f"mirai://{mirai_api_http_locate}?authKey={authKey}&qq={qq}")
-
-
 Log.write("", "", "[i]系统消息", f"QQ:{qq}启动成功.")
 @app.receiver("FriendMessage")
 async def event_gm(app: Mirai, friend: Friend, message: MessageChain):
@@ -16,7 +9,6 @@ async def event_gm(app: Mirai, friend: Friend, message: MessageChain):
 @app.receiver("MemberJoinEvent")
 async def join_event(app: Mirai, event: MemberJoinEvent):
     await app.sendGroupMessage(event.member.group.id, [At(event.member.id), Plain("Welcome!")])
-
 
 @app.receiver("GroupMessage")
 async def event_gm(app: Mirai, message: MessageChain, group: Group, member: Member,source: Source):
