@@ -57,11 +57,11 @@ def updateData(date,upload,download,uploaded,downloaded):
 def Login():
     session = requests.session()
     url = 'https://z96w.win/dologin.php'
-
     res = session.post(url, data=ccsunConfig["login"], headers=headers,verify=False,allow_redirects=False)
     cookies = res.cookies
     cookie = requests.utils.dict_from_cookiejar(cookies)
     ccsunConfig["cookie"] = cookie
+    print("ccsun重新登陆" + str(cookie))
     saveConfig()
     return cookie
 
@@ -70,7 +70,7 @@ def getBandwidth(update=False):
     session = requests.session()
     url = 'https://z96w.win/clientarea.php?action=productdetails&id=' + currenProduct
     try:
-        res = session.post(url, data=ccsunConfig["login"], headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
+        res = session.get(url, headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
     except Exception as e:
         return str(e)
     # with open('1.html', 'wb') as f:
@@ -79,10 +79,10 @@ def getBandwidth(update=False):
     toal = getMidString(res.content.decode('utf-8'),"使用报表 (流量：","GB)")
     if(toal == None):
         Login()
-        res = session.post(url, data=ccsunConfig["login"], headers=headers, cookies=ccsunConfig["cookie"], verify=False, allow_redirects=False)
+        res = session.get(url, headers=headers, cookies=ccsunConfig["cookie"], verify=False, allow_redirects=False)
+        html = res.content.decode('utf-8')
         toal = getMidString(html, "使用报表 (流量：", "GB)")
         if(toal == None):
-
             return "数据异常,请联系管理员。"
 
 
@@ -128,7 +128,7 @@ def getSub():
     session = requests.session()
     url = 'https://z96w.win/clientarea.php?action=productdetails&id=' + currenProduct
     try:
-        res = session.post(url, data=ccsunConfig["login"], headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
+        res = session.get(url, headers=headers,cookies = ccsunConfig["cookie"],verify=False,allow_redirects=False)
     except Exception as e:
         return str(e)
     html = res.content.decode('utf-8')
@@ -137,7 +137,7 @@ def getSub():
         Login()
         session = requests.session()
         url = 'https://z96w.win/clientarea.php?action=productdetails&id=' + currenProduct
-        res = session.post(url, data=ccsunConfig["login"], headers=headers, cookies=ccsunConfig["cookie"], verify=False, allow_redirects=False)
+        res = session.get(url, headers=headers, cookies=ccsunConfig["cookie"], verify=False, allow_redirects=False)
         html = res.content.decode('utf-8')
         soup = BeautifulSoup(html, "lxml")
     table = soup.select("div.panel-body table")[1]
