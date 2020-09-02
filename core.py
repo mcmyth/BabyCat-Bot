@@ -87,6 +87,20 @@ async def run_command(type: str, data: dict):
                     if os.path.exists(wikipic["imagePath"]):
                         os.remove(wikipic["imagePath"])
                     return
+                if (command[0] == "say"):
+                    result = await say(app,command, (member.id, group.id))
+                    msg = result.get("msg")
+                    status = result.get("status")
+                    if status:
+                        sendMessage = msg
+                    else:
+                        await app.sendGroupMessage(group, msg,quoteSource=source)
+                if (command[0] == "shutup"):
+                    await app.sendGroupMessage(group, await shutup(), quoteSource=source)
+                if (command[0] == "i"):
+                    await app.sendGroupMessage(group, checkMe(member.id), quoteSource=source)
+                if (command[0] == "check"):
+                    await app.sendGroupMessage(group, checkUser(command,member.id), quoteSource=source)
                 if command[0] == "testt":
                     await app.sendGroupMessage(group,str(ocrQueueCheck(group.id,member.id)))
                 if isinstance(sendMessage, list):
