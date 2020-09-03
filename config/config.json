@@ -1,8 +1,8 @@
 {
-  "proxy": "",
+  "proxy": "http://127.0.0.1:10809",
   "user": {
-    "authKey": "Your key",
+    "authKey": "DeJIOmcaisdjxDE",
     "httpapi": "localhost:55004/ws",
-    "qq": 10000
+    "qq": 1931624719
   }
 }

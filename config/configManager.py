@@ -2,18 +2,20 @@ import json
 import os
 class Config:
     config = {}
+    path = "config/config.json"
+
     def saveConfig(self):
-        f= open('config/config.json', 'w')
+        f= open(self.path, 'w')
         f.write(str(json.dumps(self.config, sort_keys=True, indent=2)))
         f.close()
 
     def loadConfig(self):
-        if os.path.isfile("config/config.json") == False:
+        if os.path.isfile(self.path) == False:
             self.newConfig()
             print("配置文件不存在，已生成到config/config.json，请打开该文件填写配置信息")
             return
         try:
-            f = open('config/config.json', 'r')
+            f = open(self.path, 'r')
             self.config = json.loads(f.read())
             return f.read()
         except:
@@ -36,6 +38,7 @@ class Config:
         self.config["user"]["httpapi"] = ""
         self.saveConfig()
 
-    def __init__(self):
+    def __init__(self,relativePath=None):
+        if not relativePath == None:self.path = relativePath
         self.loadConfig()
 

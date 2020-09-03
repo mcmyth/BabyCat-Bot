@@ -11,7 +11,15 @@ class WikiPic:
     year:str
     month: str
     day:str
-    configManager = Config()
+    confingPath:str
+    configManager:Config
+    def __init__(self,confingPath=None):
+        if confingPath != None:
+            self.confingPath = confingPath
+        else:
+            self.confingPath = "config/config.json"
+        self.configManager = Config(confingPath)
+
     async def fetch(self,session, url):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36',
