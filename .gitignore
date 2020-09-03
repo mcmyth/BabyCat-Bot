@@ -7,3 +7,4 @@ run.bat
 config.json
 ccsun.json
 venv/
+node_modules/
