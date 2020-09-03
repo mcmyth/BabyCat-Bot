@@ -1,9 +1,8 @@
 import datetime
-import json
 import os
+import json
 import sqlite3
 from bs4 import BeautifulSoup
-
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -148,3 +147,8 @@ Q:{copyBtn[2]["data-params"]}
 QX:{copyBtn[3]["data-params"]}
 C:{copyBtn[4]["data-params"]}'''
     return text
+def getChart(messageid,day="7"):
+    with os.popen(f'node {path}web.js {str(messageid)}.jpg {day}', 'r') as f:
+        text = f.read()
+    print(text)  # 打印cmd输出结果
+    return "temp/" + str(messageid) + ".jpg"
