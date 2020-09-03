@@ -43,6 +43,7 @@ async def run_command(type: str, data: dict):
         member = data[Member]
         source = data[Source]
         message = data[MessageChain]
+
         # if group.id == 570727901:
         Log.write(member.id, group.id, "[↓]群组消息", CQEncoder.messageChainToCQ(message))
         cqMessage = CQEncoder.messageChainToCQ(message)
@@ -116,6 +117,13 @@ async def run_command(type: str, data: dict):
                 await app.sendGroupMessage(ccsunGroup, getSub())
             if cqMessage == "更新数据":
                 await app.sendGroupMessage(ccsunGroup, getBandwidth(True))
+            if cqMessage[:2] == "图表":
+                if len(cqMessage) >= 2:
+                    day = cqMessage[2:]
+                    if not is_number(day):day = "7"
+                imagePath =  getChart(source.id,day)
+                await app.sendGroupMessage(ccsunGroup,[Image.fromFileSystem(imagePath)])
+                os.remove(imagePath)
             if command[0] == "/ccsun":
                 if len(command) >= 1:
                     if command[1] == "update":
