@@ -34,7 +34,10 @@ class CQEncoder:
     #将At CQ码转换为QQ号码，如转换失败则返回原始文本
     def atToQQ(self, cqCode):
         source = cqCode
-        qqNumber = self.getCQattr(cqCode, "qq")
+        try:
+            qqNumber = self.getCQattr(cqCode, "qq")
+        except:
+            qqNumber = None
         if qqNumber == None: qqNumber = source
         return qqNumber
 
