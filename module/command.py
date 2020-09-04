@@ -90,7 +90,6 @@ def set(command, qq, group):
             else:
                 return "参数不足"
         if command[2] == "admin":
-            print(command[3])
             command[3] = CQEncoder.atToQQ(command[3])
             if command[3] == "this": command[3] = str(qq.id)
             if len(command) >= 4 and len(command) < 5:
@@ -121,11 +120,10 @@ async def getWikipic(command):
     date = wikiPicJson[0]["date"]
     text = wikiPicJson[0]["text"]
     small = wikiPicJson[0]["small"]
-    large = wikiPicJson[0]["large"]
+    large =wikiPicJson[0]["large"]
     imagePath = "temp/" + getNetworkImage(small)
     sendText = [Plain(text=f'{date}维基日图\n'), Image.fromFileSystem(imagePath),
-                Plain(text=f"\n{text}\n小:{small}\n大:{large}")]
-    print("imageFilename:" + imagePath)
+                Plain(text=f"\n{text}\n小:{getShortUrl(small)}\n大:{getShortUrl(large)}")]
     ret = {"sendText": sendText, "imagePath": imagePath}
     return ret
 
@@ -157,15 +155,13 @@ async def repeat(app, text, count,object):
             break
 
 async def say(app, command, source):
-    # /cat say object text count
-
+    # '/cat say object text count' or '/cat say text'
     if len(command) <= 1: return {"status": False, "msg": "参数不足"}
     if len(command) <= 2:command.insert(1,source[1])
     object = command[1]
     if is_number(command[1]):object = int(command[1])
-    if object == "this":object =  source[1]
-    print(command)
     if object != "this" and is_number(command[1]) == False and len(command) > 1:return {"status": False, "msg": "语法错误"}
+    if object == "this":object =  source[1]
     text = command[2]
     if len(command) <= 3:
         count = 1
@@ -174,12 +170,12 @@ async def say(app, command, source):
             count = int(command[3])
         except:
             count = 1
-
     if User.user_check(source[0], "admin") == False and count > 3:return {"status": False, "msg": "非超级管理员复读不能大于3次"}
+    if User.user_check(source[0], "admin") == False and object != source[1]:return {"status": False, "msg": "非超级管理员不能指定其他群"}
+
     if count > 1:
         asyncioInterval.call_later(0.1, repeat, app, text, count,object)
     else:
-        print(object)
         await app.sendGroupMessage(object,  CQEncoder.cqToMessageChain(text))
     return {"status": True, "msg": f"发送了{count}次'{text}'"}
 
@@ -197,8 +193,10 @@ async def shutup():
 def checkMe(qq):return User.userInfo(qq)
 
 def checkUser(command,member):
+
     if User.user_check(member, "admin") == True:
         if len(command) >= 1:
+            if command[1] == "this": command[1] = member
             return User.userInfo(CQEncoder.atToQQ(command[1]))
         else:
             return "缺少参数"
