@@ -3,6 +3,7 @@ from module.cqEncoder import *
 from config.configManager import *
 from module.timer import RepeatingTimer
 from ccsun.main import *
+from module.help import *
 configManager = Config()
 CQEncoder = CQEncoder()
 Log = Log()
@@ -53,9 +54,10 @@ async def run_command(type: str, data: dict):
             if cqMessage[:9] == "[CQ:image" and message.__root__[1].type == "Image":
                 sendMessage = await tencent_ocr(cqMessage, (member.id, group.id))
                 await app.sendGroupMessage(group,sendMessage ,quoteSource=source)
-        if (cqMessage[0:4].lower() == "/cat"):
-            if (cqMessage.lower() == "/cat"):
-                sendMessage = "啪！"
+        head = "/cat"
+        if (cqMessage[0:4].lower() == head):
+            if (cqMessage.lower() == head):
+                sendMessage = f"Hi,想查询命令菜单请输入{head} help 或 {head} menu"
                 Log.write(qq, group.id, "[↑]群组消息", sendMessage)
                 await app.sendGroupMessage(group, sendMessage, quoteSource=source)
             command = commandDecode(cqMessage[5:])
@@ -102,6 +104,12 @@ async def run_command(type: str, data: dict):
                     await app.sendGroupMessage(group, checkMe(member.id), quoteSource=source)
                 if (command[0] == "check"):
                     await app.sendGroupMessage(group, checkUser(command,member.id), quoteSource=source)
+                if (command[0] == "web"):
+                    #todo Web screenshot
+                    pass
+                if (command[0] == "help" or command[0] == "menu"):
+                    await app.sendGroupMessage(group, getMenu(command), quoteSource=source)
+                    pass
                 if command[0] == "testt":
                     await app.sendGroupMessage(group,str(ocrQueueCheck(group.id,member.id)))
                 if isinstance(sendMessage, list):
@@ -121,6 +129,9 @@ async def run_command(type: str, data: dict):
                 if len(cqMessage) >= 2:
                     day = cqMessage[2:]
                     if not is_number(day):day = "7"
+                if int(day) > 180:
+                    day = "180"
+                    await app.sendGroupMessage(ccsunGroup, "最大查询过去180天的数据", quoteSource=source)
                 imagePath =  getChart(source.id,day)
                 await app.sendGroupMessage(ccsunGroup,[Image.fromFileSystem(imagePath)])
                 os.remove(imagePath)
