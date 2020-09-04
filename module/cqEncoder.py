@@ -2,19 +2,21 @@ from uuid import UUID
 from mirai import *
 import re
 import struct
-#在Mirai-Python对消息链和CQ码互相转换
-#消息链转CQ码messageChainToCQ()
-#CQ码转消息链cqToMessageChain()
+
+
+# 在Mirai-Python对消息链和CQ码互相转换
+# 消息链转CQ码messageChainToCQ()
+# CQ码转消息链cqToMessageChain()
 class CQEncoder:
     friend = False
 
-    #将UTF32转换为字符
-    def utf32ToChar(self,n):
+    # 将UTF32转换为字符
+    def utf32ToChar(self, n):
         n = int(n)
         return struct.pack('<I', n).decode('utf-32')
 
-    #取出前后两个文本之间的文本
-    def getMidString(self,text, StartStr, EndStr):
+    # 取出前后两个文本之间的文本
+    def getMidString(self, text, StartStr, EndStr):
         start = text.find(StartStr)
         if start >= 0:
             start += len(StartStr)
@@ -22,37 +24,39 @@ class CQEncoder:
             if end >= 0:
                 return text[start:end].strip()
 
-    #获取CQ码中属性的值
-    def getCQattr(self,cqCode, cqAttr):
+    # 获取CQ码中属性的值
+    def getCQattr(self, cqCode, cqAttr):
         v = self.getMidString(cqCode, cqAttr + "=", ",")
         if v == None:
             v = self.getMidString(cqCode, cqAttr + "=", "]")
         return v
-    def atToQQ(self,cqCode):
+
+    #将At CQ码转换为QQ号码，如转换失败则返回原始文本
+    def atToQQ(self, cqCode):
         source = cqCode
         qqNumber = self.getCQattr(cqCode, "qq")
         if qqNumber == None: qqNumber = source
-        print(qqNumber)
         return qqNumber
-    #获取CQ码的类型
-    def getCQtype(self,cqcode):
+
+    # 获取CQ码的类型
+    def getCQtype(self, cqcode):
         return self.getMidString(cqcode, "[CQ:", ",")
 
-    #将CQ码存入List中
-    def cqCodeParsing(self,text):
+    # 将CQ码存入List中
+    def cqCodeParsing(self, text):
         regex = r'(\[CQ:(.+?)\])'
         pattern = re.compile(regex)
-        #print(re.findall(pattern, text))
+        # print(re.findall(pattern, text))
         return re.findall(pattern, text)
 
-    def replaceChar(self,string, char, start, end):
+    def replaceChar(self, string, char, start, end):
         string = list(string)
         del (string[start:end])
         string.insert(start, char)
         return ''.join(string)
 
-    #获得文本中每一个CQ码的起始和结束位置
-    def getCQIndex(self,text):
+    # 获得文本中每一个CQ码的起始和结束位置
+    def getCQIndex(self, text):
         cqIndex = []
         cqIndex.clear()
         p = re.compile("(\[CQ:(.+?)\])")
@@ -61,20 +65,23 @@ class CQEncoder:
         cqIndex.append((len(text), len(text)))
         return cqIndex
 
-    #转义中括号
-    def escapeChar(self,text,isEscape=True):
+    # 转义中括号
+    def escapeChar(self, text, isEscape=True):
         if isEscape:
-            text = text.replace("[", "&brackets_left;")
-            text = text.replace("]", "&brackets_right;")
+            text = text.replace("&", "&amp;")
+            text = text.replace(" ", "&nbsp;")
+            text = text.replace("[", "&lt;")
+            text = text.replace("]", "&gt;")
         else:
-            text = text.replace("&brackets_left;", "[")
-            text = text.replace("&brackets_right;", "]")
+            text = text.replace("&lt;", "[")
+            text = text.replace("&gt;", "]")
+            text = text.replace("&nbsp;", " ")
+            text = text.replace("&amp;", "&")
         return text
-    #将CQ码以外的文本转换成类型为“plain”的CQ码
-    def plainToCQ(self,text):
-        i = 0
-        j = 0
-        k = 0
+
+    # 将CQ码以外的文本转换成类型为“plain”的CQ码
+    def plainToCQ(self, text):
+        i = j = k = 0
         cqIndex = self.getCQIndex(text)
         while i < len(cqIndex):
             if i > 0:
@@ -83,37 +90,34 @@ class CQEncoder:
                 else:
                     j = j + 1
             if i > 0:
-                self.getCQIndex(text)
+                cqIndex = self.getCQIndex(text)
                 source_text = text[cqIndex[j][k]:cqIndex[j + 1][0]]
                 if source_text != "":
                     source_text = self.escapeChar(source_text)
                     text = self.replaceChar(text, f"[CQ:plain,text={source_text}]", cqIndex[j][k], cqIndex[j + 1][0])
             else:
-                self.getCQIndex(text)
+                cqIndex = self.getCQIndex(text)
                 source_text = text[0:cqIndex[0][0]]
                 if (source_text != ""):
                     source_text = self.escapeChar(source_text)
                     text = self.replaceChar(text, f"[CQ:plain,text={source_text}]", 0, cqIndex[0][0])
             i = i + 1
-        print(text)
         return text
 
-
-    #取CQ码配置文件中URL的值
-    def getImageURL(self,imgConfigPath, fileName):
+    # 取CQ码配置文件中URL的值
+    def getImageURL(self, imgConfigPath, fileName):
         if imgConfigPath[-1] != "\\": imgConfigPath += "\\"
         try:
-            #print(imgConfigPath + fileName+".cqimg")
-            f = open(imgConfigPath + fileName+".cqimg", 'r')
-
+            # print(imgConfigPath + fileName+".cqimg")
+            f = open(imgConfigPath + fileName + ".cqimg", 'r')
             return self.getMidString(f.read(), "url=", "\n")
         finally:
             if f:
                 f.close()
 
-    #将CQ码转为消息链
-    #填入图片配置路径默认进入读取配置文件的模式
-    def cqToMessageChain(self,text,imgConfigPath = ""):
+    # 将CQ码转为消息链
+    # 填入图片配置路径默认进入读取配置文件的模式
+    def cqToMessageChain(self, text, imgConfigPath=""):
         text = self.plainToCQ(text)
         cqList = self.cqCodeParsing(text)
         chain = []
@@ -121,8 +125,8 @@ class CQEncoder:
             if self.getCQtype(x[0]) == "face":
                 chain.append(Face(faceId=self.getCQattr(x[0], "id")))
             elif self.getCQtype(x[0]) == "plain":
-                plain = self.getCQattr(x[0],"text")
-                plain = self.escapeChar(plain,False)
+                plain = self.getCQattr(x[0], "text")
+                plain = self.escapeChar(plain, False)
                 chain.append(Plain(text=plain))
             elif self.getCQtype(x[0]) == "at":
                 chain.append(At(self.getCQattr(x[0], "qq")))
@@ -132,7 +136,7 @@ class CQEncoder:
                 if self.friend == False:
                     cqImg = x[0]
                     if imgConfigPath != "":
-                        cqImg = "[CQ:image,url=" + self.getImageURL(imgConfigPath,self.getCQattr(x[0], "file")) + "]"
+                        cqImg = "[CQ:image,url=" + self.getImageURL(imgConfigPath, self.getCQattr(x[0], "file")) + "]"
                     imgid = self.getMidString(self.getCQattr(cqImg, "url"), "-", "/0")
                     if imgid != None:
                         imgid = imgid[imgid.rfind('-') + 1:]
@@ -151,12 +155,12 @@ class CQEncoder:
                 chain.append(Plain("unknown"))
         return chain
 
-    def __init__(self,f=None):
+    def __init__(self, f=None):
         if f == True: self.friend = True
 
-    #将消息链转换成CQ码（不完善，部分特殊消息没做处理）
-    #cqimg配置文件已被弃用，默认将URL填入CQ码中的url属性中
-    def messageChainToCQ(self,messagChain):
+    # 将消息链转换成CQ码（不完善，部分特殊消息没做处理）
+    # cqimg配置文件已被弃用，默认将URL填入CQ码中的url属性中
+    def messageChainToCQ(self, messagChain):
         try:
             messageChainList = ([*(msg for msg in messagChain.__root__[1:])])
         except:
@@ -164,23 +168,23 @@ class CQEncoder:
         ret = ""
         for x in messageChainList:
             type = x.type
-            if (type == "MessageComponentTypes.Plain"):
+            if type == "MessageComponentTypes.Plain":
                 ret = ret + x.text
-            if (type == "Face"):
+            if type == "Face":
                 ret = ret + "[CQ:face,id=" + str(x.faceId) + ",name=" + x.name + "]"
-            elif (type == "Image"):
+            elif type == "Image":
                 ret = ret + "[CQ:image,url=" + x.url + "]"
-            elif (type == "At"):
+            elif type == "At":
                 ret = ret + "[CQ:at,qq=" + str(x.target) + "]"
-            elif (type == "AtAll"):
+            elif type == "AtAll":
                 ret = ret + "[CQ:at,qq=all]"
-            elif (type == "Source"):
+            elif type == "Source":
                 ret = ret + ""
-            elif (type == "Quote"):
+            elif type == "Quote":
                 ret = ret + ""
-            elif (type == "FlashImage"):
+            elif type == "FlashImage":
                 ret = ret + ""
-            elif (type == "Unknown"):
+            elif type == "Unknown":
                 ret = ret + ""
             elif type == "App":
                 x = "暂不支持该消息"
@@ -193,6 +197,5 @@ class CQEncoder:
                 except IOError:
                     ret = ret + "[CQ:error]"
                     print("解析消息失败：" + str(IOError))
-        #print("解析消息：\n" + str(ret))
+        # print("解析消息：\n" + str(ret))
         return ret
-
