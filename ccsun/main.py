@@ -12,11 +12,9 @@ def loadConfig():
     config = json.loads(f.read())
     return config
 
-
 ccsunConfig = loadConfig()
 currenProduct = ccsunConfig["user"]["product"]
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'}
+headers = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'}
 
 
 def getMidString( text, StartStr, EndStr):
@@ -50,7 +48,6 @@ def updateData(date,upload,download,uploaded,downloaded):
     else:
         conn.close()
         return True
-
 
 
 def Login():
@@ -148,7 +145,7 @@ QX:{copyBtn[3]["data-params"]}
 C:{copyBtn[4]["data-params"]}'''
     return text
 def getChart(messageid,day="7"):
-    with os.popen(f'node {path}web.js {str(messageid)}.jpg {day}', 'r') as f:
+    with os.popen(f'node module\js\ccsun.js {str(messageid)}.jpg {day}', 'r') as f:
         text = f.read()
     print(text)  # 打印cmd输出结果
     return "temp/" + str(messageid) + ".jpg"
