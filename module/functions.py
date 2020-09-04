@@ -1,7 +1,10 @@
 import ctypes
+import hashlib
+import json
 import os
 import urllib.request
-
+import requests
+from module.dateParse import *
 
 class MEMORYSTATUSEX(ctypes.Structure):
     _fields_ = [
@@ -68,5 +71,28 @@ def is_number(s):
         return True
     except (TypeError, ValueError):
         pass
-
     return False
+DateTimeGenerator = DateTimeGenerator()
+def getShortUrl(originalUrl):
+    timestamp = DateTimeGenerator.dateTimeToTimestamp()
+    session = requests.session()
+    confingPath = "config/config.json"
+    f = open(confingPath, 'r')
+    config = json.loads(f.read())
+    apiKey = config["shorturl_key"]
+    postData = {
+        "url": originalUrl,
+        "signature": hashlib.md5((str(timestamp) + apiKey).encode('utf-8')).hexdigest(),
+        "timestamp": timestamp,
+        "action": "shorturl",
+        "format": "json"
+    }
+    res = session.post("https://6lu.cc/yourls-api.php", data=postData)
+    content = res.content.decode('utf-8')
+    try:
+        result = json.loads(content)
+        shortUrl = result["shorturl"]
+    except:
+        shortUrl = ""
+        print("获取短网址失败！")
+    return shortUrl
