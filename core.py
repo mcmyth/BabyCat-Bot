@@ -23,6 +23,9 @@ async def Timer1():
         try:
             # CCSUN流量统计
             await app.sendGroupMessage(ccsunGroup, getBandwidth(True))
+            #月结日重置总计流量
+            if resetTotal():
+                await app.sendGroupMessage(ccsunGroup, "流量已重置")
             # 维基日图
             wikipic = await getWikipic(['wikipic'])
             sendMessage = wikipic["sendText"]
